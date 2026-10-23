@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 트렌드 인생 4컷</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #ff7b00, #ff007b, #6b00ff, #00d4ff);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 2026 Trend: Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+        }
+
+        /* Video element styling */
+        video {
+            transform: scaleX(-1); /* Mirror effect */
+            border-radius: 16px;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .filter-grayscale { filter: grayscale(100%); }
+        .filter-sepia { filter: sepia(100%); }
+        .filter-invert { filter: invert(100%); }
+        .filter-contrast { filter: contrast(150%) brightness(110%); }
+
+        #countdown {
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 sm:p-8">
+
+    <header class="mb-8 text-center">
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">LIFE 4 CUTS</h1>
+        <p class="text-sm sm:text-base opacity-80">2026 Edition - Capture your moment</p>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-8 w-full max-w-5xl">
+        
+        <!-- Camera Section -->
+        <div class="glass-panel p-6 flex-1 flex flex-col items-center relative">
+            <h2 class="text-xl font-semibold mb-4 w-full text-left">📷 Camera</h2>
+            
+            <div class="relative w-full max-w-md aspect-[3/4] sm:aspect-video lg:aspect-[4/3] flex justify-center overflow-hidden rounded-2xl">
+                <video id="video" autoplay playsinline class="shadow-inner"></video>
+                <!-- Countdown Overlay -->
+                <div id="countdown" class="absolute inset-0 flex items-center justify-center text-7xl sm:text-9xl font-bold opacity-0 transition-opacity duration-200 pointer-events-none">
+                    3
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 w-full flex flex-col sm:flex-row gap-4">
+                <select id="filterSelect" class="flex-1 glass-panel px-4 py-3 text-white appearance-none outline-none cursor-pointer text-center sm:text-left bg-transparent">
+                    <option value="none" class="text-black">기본 필터 (Normal)</option>
+                    <option value="grayscale" class="text-black">흑백 감성 (Grayscale)</option>
+                    <option value="sepia" class="text-black">클래식 세피아 (Sepia)</option>
+                    <option value="contrast" class="text-black">레트로 팝 (Contrast)</option>
+                    <option value="invert" class="text-black">색상 반전 (Invert)</option>
+                </select>
+                
+                <button id="captureBtn" class="flex-1 bg-white text-gray-900 font-bold px-6 py-3 rounded-2xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg border border-white/50">
+                    📸 촬영 시작
+                </button>
+            </div>
+            
+            <p id="statusText" class="mt-4 text-sm opacity-70">준비 완료. 버튼을 눌러 촬영을 시작하세요.</p>
+        </div>
+
+        <!-- Result Section -->
+        <div class="glass-panel p-6 flex-1 flex flex-col items-center justify-between">
+            <h2 class="text-xl font-semibold mb-4 w-full text-left">✨ Result</h2>
+            
+            <!-- Result Canvas Container -->
+            <div class="flex-1 w-full flex items-center justify-center overflow-y-auto py-4">
+                <canvas id="resultCanvas" class="hidden shadow-2xl rounded-sm"></canvas>
+                <div id="placeholder" class="text-center opacity-50 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p>사진을 촬영하면 이곳에 정렬됩니다.</p>
+                </div>
+            </div>
+
+            <button id="downloadBtn" class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold px-6 py-3 rounded-2xl opacity-50 cursor-not-allowed transition-all shadow-lg border border-white/20">
+                다운로드 📥
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas for raw capturing -->
+    <canvas id="captureCanvas" class="hidden"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const filterSelect = document.getElementById('filterSelect');
+        const captureBtn = document.getElementById('captureBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const countdownEl = document.getElementById('countdown');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const ctx = resultCanvas.getContext('2d');
+        const captureCanvas = document.getElementById('captureCanvas');
+        const capCtx = captureCanvas.getContext('2d');
+        const placeholder = document.getElementById('placeholder');
+        const statusText = document.getElementById('statusText');
+
+        let stream = null;
+        let images = [];
+        const MAX_SHOTS = 4;
+        let currentShot = 0;
+        
+        // Frame Settings for Life 4 Cuts (Vertical strip)
+        const frameWidth = 400;
+        const photoWidth = 360;
+        const photoHeight = 240;
+        const padding = 20;
+        // Total height: 4 photos + padding + extra bottom space for branding
+        const frameHeight = (photoHeight * 4) + (padding * 5) + 60; 
+
+        // Init Camera
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Camera error:", err);
+                statusText.innerText = "카메라를 불러올 수 없습니다. 권한을 확인해주세요.";
+            }
+        }
+
+        // Apply Filter to Video
+        filterSelect.addEventListener('change', (e) => {
+            const filterType = e.target.value;
+            video.className = 'shadow-inner'; // reset
+            if (filterType !== 'none') {
+                video.classList.add(`filter-${filterType}`);
+            }
+        });
+
+        // Mapping CSS filter to Canvas filter
+        function getCanvasFilter(type) {
+            switch(type) {
+                case 'grayscale': return 'grayscale(100%)';
+                case 'sepia': return 'sepia(100%)';
+                case 'invert': return 'invert(100%)';
+                case 'contrast': return 'contrast(150%) brightness(110%)';
+                default: return 'none';
+            }
+        }
+
+        // Capture Process
+        captureBtn.addEventListener('click', async () => {
+            if (!stream) {
+                alert("카메라가 활성화되지 않았습니다.");
+                return;
+            }
+
+            images = [];
+            currentShot = 0;
+            captureBtn.disabled = true;
+            captureBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            filterSelect.disabled = true;
+            
+            // Setup Result Canvas
+            resultCanvas.width = frameWidth;
+            resultCanvas.height = frameHeight;
+            
+            // Draw Background Frame (Black or Dark Gray)
+            ctx.fillStyle = "#111111";
+            ctx.fillRect(0, 0, frameWidth, frameHeight);
+            
+            takeNextPhoto();
+        });
+
+        function takeNextPhoto() {
+            if (currentShot >= MAX_SHOTS) {
+                finishCapture();
+                return;
+            }
+
+            statusText.innerText = `촬영 중... (${currentShot + 1}/${MAX_SHOTS})`;
+            
+            let count = 3;
+            countdownEl.innerText = count;
+            countdownEl.style.opacity = 1;
+
+            const timer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.innerText = count;
+                } else if (count === 0) {
+                    countdownEl.innerText = "찰칵!";
+                } else {
+                    clearInterval(timer);
+                    countdownEl.style.opacity = 0;
+                    capturePhoto();
+                    currentShot++;
+                    setTimeout(takeNextPhoto, 1000); // Wait 1 sec before next countdown
+                }
+            }, 1000);
+        }
+
+        function capturePhoto() {
+            // Flash effect
+            const flash = document.createElement('div');
+            flash.className = 'absolute inset-0 bg-white opacity-80 z-50 pointer-events-none transition-opacity duration-300';
+            video.parentElement.appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
+
+            // Draw to hidden canvas to get image data
+            captureCanvas.width = video.videoWidth;
+            captureCanvas.height = video.videoHeight;
+            
+            // Mirror image on canvas since camera is mirrored
+            capCtx.translate(captureCanvas.width, 0);
+            capCtx.scale(-1, 1);
+            capCtx.drawImage(video, 0, 0);
+
+            const imgData = captureCanvas.toDataURL('image/jpeg', 0.9);
+            const img = new Image();
+            img.src = imgData;
+            
+            img.onload = () => {
+                const currentFilter = getCanvasFilter(filterSelect.value);
+                ctx.filter = currentFilter;
+                
+                // Calculate position
+                const x = padding;
+                const y = padding + (currentShot * (photoHeight + padding));
+                
+                // Draw photo onto the result frame
+                ctx.drawImage(img, x, y, photoWidth, photoHeight);
+                ctx.filter = 'none'; // reset filter
+            };
+        }
+
+        function finishCapture() {
+            statusText.innerText = "촬영 완료! 다운로드 버튼을 눌러 사진을 저장하세요.";
+            
+            // Add branding text at the bottom
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 20px Inter, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("LIFE 4 CUTS", frameWidth / 2, frameHeight - 30);
+            ctx.font = "12px Inter, sans-serif";
+            ctx.fillText("2026 EDITION", frameWidth / 2, frameHeight - 12);
+
+            // Update UI
+            placeholder.classList.add('hidden');
+            resultCanvas.classList.remove('hidden');
+            
+            captureBtn.disabled = false;
+            captureBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            captureBtn.innerText = "🔄 다시 촬영";
+            filterSelect.disabled = false;
+
+            downloadBtn.disabled = false;
+            downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            downloadBtn.classList.add('hover:scale-105', 'active:scale-95');
+        }
+
+        // Download functionality
+        downloadBtn.addEventListener('click', () => {
+            if (downloadBtn.disabled) return;
+            
+            const dataUrl = resultCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+            link.download = `life4cuts-${date}.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        // Run on load
+        window.addEventListener('load', initCamera);
+    </script>
+</body>
+</html>
